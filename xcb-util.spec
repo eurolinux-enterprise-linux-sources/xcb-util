@@ -4,7 +4,7 @@
 
 Name:		xcb-util
 Version:	0.3.6
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Convenience libraries sitting on top of libxcb
 
 Group:		System Environment/Libraries
@@ -33,6 +33,15 @@ Requires:	%{name} = %{version}-%{release}, pkgconfig
 %description	devel
 Development files for xcb-util.
 
+%package -n compat-xcb-util
+Summary:	Compatibility libraries atop libxcb
+Group:		System Environment/Libraries
+
+%description -n compat-xcb-util
+Compatibility versions of various xcb utility libraries.  In RHEL 6.6 and
+later, newer versions of these libraries are provided in their own source
+and binary packages.
+
 %prep
 %setup -q
 # moral equivalent of fd626329982cc2766e5a85a75ea2800b7aa3f114
@@ -56,8 +65,11 @@ sed s!@LIBDIR@!%{_libdir}! %{SOURCE2} > %{buildroot}%{_libdir}/pkgconfig/xcb-uti
 # remove RPATH
 chrpath --delete $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libxcb-*.so.*
 
-# remove libraries that have their own srpm now
-rm -f %{buildroot}%{_libdir}/libxcb-{icccm,image,keysyms}.so*
+# remove devel symlinks for compat libs
+rm -f %{buildroot}%{_libdir}/libxcb-{icccm,image,keysyms}.so
+
+# remove sonames that clash with new split packages
+rm -f %{buildroot}%{_libdir}/libxcb-{image,keysyms}.so*
 
 # also pkgconfig
 rm -f %{buildroot}%{_libdir}/pkgconfig/xcb-{icccm,image,keysyms}.pc
@@ -68,8 +80,10 @@ rm -f %{buildroot}%{_includedir}/xcb/xcb_{icccm,image,keysyms}.h
 rm %{buildroot}%{_libdir}/*.la
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
+
+%post -n compat-xcb-util -p /sbin/ldconfig
+%postun -n compat-xcb-util -p /sbin/ldconfig
 
 %clean
 rm -rf %{buildroot}
@@ -90,7 +104,16 @@ rm -rf %{buildroot}
 %{_libdir}/*.so
 %{_includedir}/xcb/*.h
 
+%files -n compat-xcb-util
+%defattr(-,root,root,-)
+%{_libdir}/libxcb-icccm.so.1*
+#{_libdir}/libxcb-image.so.0*
+#{_libdir}/libxcb-keysyms.so.1*
+
 %changelog
+* Thu Dec 18 2014 Adam Jackson <ajax@redhat.com> 0.3.6-6
+- Add compat-xcb-util subpackage to restore libxcb-icccm.so.1
+
 * Wed Apr 23 2014 Adam Jackson <ajax@redhat.com> 0.3.6-5
 - Add <xcb/xcb_util.h> and xcb-util.pc for source compat with >= 0.3.8
 - Backport pkgconfig fix from upstream
