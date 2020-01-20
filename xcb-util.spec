@@ -1,6 +1,6 @@
 Name:		xcb-util
 Version:	0.3.9
-Release:	2%{?dist}
+Release:	4%{?dist}
 Summary:	Convenience libraries sitting on top of libxcb
 
 Group:		System Environment/Libraries
@@ -77,6 +77,12 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 0.3.9-4
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.3.9-3
+- Mass rebuild 2013-12-27
+
 * Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
