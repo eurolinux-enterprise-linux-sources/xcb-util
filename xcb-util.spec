@@ -1,14 +1,12 @@
 Name:		xcb-util
-Version:	0.3.9
-Release:	4%{?dist}
+Version:	0.4.0
+Release:	2%{?dist}
 Summary:	Convenience libraries sitting on top of libxcb
-
 Group:		System Environment/Libraries
 License:	MIT
 URL:		http://xcb.freedesktop.org
 Source0:	http://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
-BuildRequires:	gperf, pkgconfig, libxcb-devel >= 1.4, m4, xorg-x11-proto-devel
-BuildRequires:	chrpath
+BuildRequires:	pkgconfig(xcb) >= 1.4
 
 
 %description
@@ -23,7 +21,8 @@ the X protocol but which have traditionally been provided by Xlib.
 %package 	devel
 Summary:	Development and header files for xcb-util
 Group:		System Environment/Libraries
-Requires:	%{name} = %{version}-%{release}, pkgconfig
+Requires:	%{name}%{?isa} = %{version}-%{release}
+
 %description	devel
 Development files for xcb-util.
 
@@ -33,24 +32,16 @@ Development files for xcb-util.
 
 
 %build
-%configure --with-pic --disable-static
-
+%configure --with-pic --disable-static --disable-silent-rules
 make %{?_smp_mflags}
 
 
 %check
-
 make check
 
 
 %install
-rm -rf %{buildroot}
-
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
-
-# remove RPATH
-chrpath --delete $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libxcb-*.so.*
-
+make install DESTDIR=%{buildroot} INSTALL="install -p"
 rm %{buildroot}%{_libdir}/*.la
 
 
@@ -60,28 +51,36 @@ rm %{buildroot}%{_libdir}/*.la
 %postun -p /sbin/ldconfig
 
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
-%defattr(-,root,root,-)
-%doc README
+%doc README COPYING
 %{_libdir}/libxcb-util.so.1*
 
+
 %files devel
-%defattr(-,root,root,-)
+%doc NEWS
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
 %{_includedir}/xcb/*.h
 
 
 %changelog
-* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 0.3.9-4
-- Mass rebuild 2014-01-24
+* Wed Oct 22 2014 Thomas Moschny <thomas.moschny@gmx.de> - 0.4.0-2
+- Move NEWS to -devel.
 
-* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.3.9-3
-- Mass rebuild 2013-12-27
+* Wed Oct 22 2014 Thomas Moschny <thomas.moschny@gmx.de> - 0.4.0-1
+- Update to 0.4.0.
+- Modernize spec file.
+- Include COPYING.
+- Update requirements.
+
+* Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.9-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
 * Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
